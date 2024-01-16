@@ -13,7 +13,6 @@ module.exports = {
   register: async (req, res) => {
     const { name, email, password } = req.body;
 
-    let hashPassword;
     if (name && email && password) {
       // Assume userPassword is the password you want to hash
       bcrypt.hash(password, saltRounds, async (err, hash) => {
@@ -21,6 +20,7 @@ module.exports = {
           // Handle error
         } else {
           // Store 'hash' in your database
+          try{
           const user = await UserModel.User.create({
             name,
             email,
@@ -40,7 +40,10 @@ module.exports = {
             res.status(401).send("Authentication failed");
           }
         }
-      });
+        catch(error){
+          res.status(400).json({"message": ""+error})
+        }
+      }});
     }
   },
   login: async (req, res) => {
