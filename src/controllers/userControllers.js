@@ -20,30 +20,32 @@ module.exports = {
           // Handle error
         } else {
           // Store 'hash' in your database
-          try{
-          const user = await UserModel.User.create({
-            name,
-            email,
-            password: hash,
-          });
-    
-          if (!user) {
-            res.status(400).json({ message: "something wrong on register user!" });
-          }
-    
-          if (user) {
-            // Generate JWT and set as HttpOnly cookie
-            const token = generateToken(user);
-            res.cookie("authToken", token, { httpOnly: true });
-            res.status(201).json(user);
-          } else {
-            res.status(401).send("Authentication failed");
+          try {
+            const user = await UserModel.User.create({
+              name,
+              email,
+              password: hash,
+            });
+
+            if (!user) {
+              res
+                .status(400)
+                .json({ message: "something wrong on register user!" });
+            }
+
+            if (user) {
+              // Generate JWT and set as HttpOnly cookie
+              const token = generateToken(user);
+              res.cookie("authToken", token, { httpOnly: true });
+              res.status(201).json(user);
+            } else {
+              res.status(401).send("Authentication failed");
+            }
+          } catch (error) {
+            res.status(400).json({ message: "" + error });
           }
         }
-        catch(error){
-          res.status(400).json({"message": ""+error})
-        }
-      }});
+      });
     }
   },
   login: async (req, res) => {
@@ -77,6 +79,10 @@ module.exports = {
     } else {
       res.status(401).send("Authentication failed");
     }
+  },
+  logout: async (req, res) => {
+    res.clearCookie("authToken");
+    res.json({ message: "logout with success" });
   },
   getAllUser: async (req, res) => {
     try {
