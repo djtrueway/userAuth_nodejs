@@ -94,4 +94,30 @@ module.exports = {
       res.status(500).send("Internal Server Error");
     }
   },
+  status: async (req, res) => {
+    const authToken = req.cookies.authToken;
+
+    if (!authToken) {
+      return res
+        .status(401)
+        .json({ status: "error", message: "Unauthorized: Token not found" });
+    }
+
+    jwt.verify(authToken, secretKey, (err, decoded) => {
+      if (err) {
+        return res
+          .status(401)
+          .json({ status: "error", message: "Unauthorized: Invalid token" });
+      }
+
+      // At this point, decoded contains the information from the JWT
+      // For example, decoded.userId
+
+      // You can use the decoded information to find the user in your database
+      // Mocked user data (replace with a database query)
+      const user = { id: decoded.userId, username: "user1" };
+
+      res.json({ status: "success", user });
+    });
+  },
 };
